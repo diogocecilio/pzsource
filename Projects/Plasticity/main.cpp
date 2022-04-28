@@ -49,7 +49,6 @@ using namespace std;
 class TPZMaterial;
 
 
-
 int bottombc_slope=-1;
 int rigthbc_slope = -2;
 int leftbc_slope =-3;
@@ -81,17 +80,17 @@ int main()
 	
 	int ref=3;
 	
-    //TPZGeoMesh *gmesh = CreateGMesh( ref);
-	TPZGeoMesh *gmesh = CreateGMeshSlope( ref);
+    TPZGeoMesh *gmesh = CreateGMesh( ref);
+	//TPZGeoMesh *gmesh = CreateGMeshSlope( ref);
 
     std::ofstream meshfile ( "GeoMeshSlope.txt" );
 	
     gmesh->Print ( meshfile );
 
     // Create computational mesh
-    //TPZCompMesh *cmesh = CreateCMesh ( gmesh, porder );
+    TPZCompMesh *cmesh = CreateCMesh ( gmesh, porder );
 	
-	TPZCompMesh *cmesh = CreateCMeshSlopeFlow ( gmesh, porder );
+	//TPZCompMesh *cmesh = CreateCMeshSlopeFlow ( gmesh, porder );
 	
     std::ofstream comVfile ( "CompMeshSlope.txt" );
 	

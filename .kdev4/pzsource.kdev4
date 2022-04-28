@@ -1,3 +1,6 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x10\x00p\x00z\x00s\x00o\x00u\x00r\x00c\x00e)
+
 [CMake]
 Build Directory Count=3
 Current Build Directory Index-Host System=2
@@ -30,7 +33,7 @@ CMake Binary=/usr/bin/cmake
 CMake Executable=/usr/bin/cmake
 Environment Profile=
 Extra Arguments=
-Install Directory=
+Install Directory=/opt/neopz
 Runtime=Host System
 
 [Project]

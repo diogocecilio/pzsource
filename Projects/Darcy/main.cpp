@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "pzcmesh.h"
 #include "pzgmesh.h"
 #include "pzstack.h"
 #include "TPZVTKGeoMesh.h"
@@ -47,7 +48,9 @@
 #include <TPZSimpleTimer.h>
 #include "TPZBndCondT.h"
 #include "DarcyFlow/TPZHybridDarcyFlow.h"
+class TPZCompMesh;
 #include "DarcyFlow/TPZMixedDarcyFlow.h"
+class TPZGeoMesh;
 using namespace std;
 class TPZMaterial;
 
@@ -124,7 +127,7 @@ int main()
     ///vtk export
     TPZVec<std::string> scalarVars ( 1 ),vectorVars ( 1 );
     scalarVars[0] = "Pressure";
-    vectorVars[0] = "Flux";
+    vectorVars[0] = "GradU";
     analysis.DefineGraphMesh ( 2,scalarVars,vectorVars,"Darcy.vtk" );
     constexpr int resolution{0};
     analysis.PostProcess ( resolution );
@@ -364,9 +367,12 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
 
 	int matid=1;
 	
-   // auto *material = new TPZDarcyFlow ( matid,dim );
+    auto *material = new TPZDarcyFlow ( matid,dim );
 	//auto *material = new TPZHybridDarcyFlow ( matid,dim );
-	auto *material = new TPZMixedDarcyFlow ( matid,dim );
+	//auto *material = new TPZMixedDarcyFlow ( matid,dim );
+	
+	material->SetId(matid);
+	
 	REAL permeability = 1.;
     material->SetConstantPermeability ( permeability );
 	
