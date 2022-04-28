@@ -1,7 +1,6 @@
 
 #include <cmath>
 #include <set>
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -12,15 +11,11 @@
 #include <TPZLinearAnalysis.h> //for TPZLinearAnalysis
 #include <TPZSSpStructMatrix.h>
 #include "TPZBndCond.h"
-#include "DarcyFlow/TPZDarcyFlow.h"
-//#include "TPZDarcyMaterial.h"
-
 #include <pzgeoel.h>
 #include "pzgeoelbc.h"
 #include "pzfmatrix.h"
 #include "pzbstrmatrix.h"
 #include <TPZGeoElement.h>
-#include "TPZVTKGeoMesh.h"
 #include "pzbuildmultiphysicsmesh.h"
 #include "TPZInterfaceEl.h"
 #include "TPZMultiphysicsInterfaceEl.h"
@@ -46,15 +41,10 @@
 #include <pzstepsolver.h> //for TPZStepSolver
 #include <TPZSimpleTimer.h>
 #include "TPZBndCondT.h"
-#include "DarcyFlow/TPZHybridDarcyFlow.h"
-#include "DarcyFlow/TPZMixedDarcyFlow.h"
+#include "DarcyFlow/TPZDarcyFlow.h"
 using namespace std;
-class TPZMaterial;
 
-int bottombc=-1;
-int rigthbc = -2;
-int topbc = -3;
-int leftbc =-4;
+class TPZMaterial;
 
 
 
@@ -64,6 +54,14 @@ int leftbc_slope =-3;
 int toprigthbc_slope = -4;
 int topleftbc_slope = -5;
 int rampbc_slope = -6;
+
+int bottombc = -1;
+
+int rigthbc = -2;
+
+int topbc = -3;
+	
+int leftbc = -4;
 
 // brief Function to create the geometric mesh
 TPZGeoMesh *CreateGMesh (int ref );
@@ -364,9 +362,9 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
 
 	int matid=1;
 	
-   // auto *material = new TPZDarcyFlow ( matid,dim );
+    auto *material = new TPZDarcyFlow ( matid,dim );
 	//auto *material = new TPZHybridDarcyFlow ( matid,dim );
-	auto *material = new TPZMixedDarcyFlow ( matid,dim );
+	//auto *material = new TPZMixedDarcyFlow ( matid,dim );
 	REAL permeability = 1.;
     material->SetConstantPermeability ( permeability );
 	

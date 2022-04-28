@@ -961,7 +961,16 @@ void TPZElastoPlasticAnalysis::ManageIterativeProcess(std::ostream &out,REAL tol
 #include "tpzcube.h"
 
 #include "pzelctemp.h"
+#include "TPZCompElH1.h"
 
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapePoint> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeLinear> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeTriang> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeQuad> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeCube> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeTetra> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapePrism> >>;
+// template class TPZRestoreClass<TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapePiram> >>;
 
 void TPZElastoPlasticAnalysis::SetAllCreateFunctionsWithMem(TPZCompMesh *cmesh)
 {
@@ -974,57 +983,65 @@ void TPZElastoPlasticAnalysis::SetAllCreateFunctionsWithMem(TPZCompMesh *cmesh)
 	pzgeom::TPZGeoCube::fp = TPZElastoPlasticAnalysis::CreateCubeElWithMem;
 */
     TPZManVector<TCreateFunction,10> functions(8);
-    functions[EPoint] = &TPZElastoPlasticAnalysis::CreatePointElWithMem;
+
+    /*functions[EPoint] = &TPZElastoPlasticAnalysis::CreatePointElWithMem;
 	functions[EOned] = TPZElastoPlasticAnalysis::CreateLinearElWithMem;
 	functions[EQuadrilateral] = TPZElastoPlasticAnalysis::CreateQuadElWithMem;
 	functions[ETriangle] = TPZElastoPlasticAnalysis::CreateTriangElWithMem;
 	functions[EPrisma] = TPZElastoPlasticAnalysis::CreatePrismElWithMem;
 	functions[ETetraedro] = TPZElastoPlasticAnalysis::CreateTetraElWithMem;
 	functions[EPiramide] = TPZElastoPlasticAnalysis::CreatePyramElWithMem;
-	functions[ECube] = TPZElastoPlasticAnalysis::CreateCubeElWithMem;
+	functions[ECube] = TPZElastoPlasticAnalysis::CreateCubeElWithMem;*/
     cmesh->ApproxSpace().SetCreateFunctions(functions);
 
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreateCubeElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeCube > >(mesh,gel,index);
+	//TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeCube> >
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeCube> >(mesh,gel);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreateLinearElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeLinear > >(mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeLinear > >(mesh,gel);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreatePointElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapePoint > >(mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapePoint > >(mesh,gel);
+	//return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapePoint > >(mesh,gel,index);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreatePrismElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapePrism > >(mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapePrism > >(mesh,gel);
+	//return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapePrism > >(mesh,gel,index);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreatePyramElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapePiram > >(mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapePiram > >(mesh,gel);
+	//return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapePiram > >(mesh,gel,index);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreateQuadElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
 //	return new TPZCompElWithMem< TPZIntelGenPlus<TPZIntelGen< pzshape::TPZShapeQuad > > >(mesh,gel,index);
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeQuad > > (mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeQuad > >(mesh,gel);
+	//return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeQuad > > (mesh,gel,index);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreateTetraElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeTetra > >(mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeTetra > >(mesh,gel);
+	//return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeTetra > >(mesh,gel,index);
 }
 
 TPZCompEl * TPZElastoPlasticAnalysis::CreateTriangElWithMem(TPZGeoEl *gel, TPZCompMesh &mesh, int64_t &index)
 {
-	return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeTriang > >(mesh,gel,index);
+	return new TPZCompElWithMem<TPZCompElH1<pzshape::TPZShapeTriang > >(mesh,gel);
+	//return new TPZCompElWithMem< TPZIntelGen< pzshape::TPZShapeTriang > >(mesh,gel,index);
 }
 
 void TPZElastoPlasticAnalysis::IdentifyEquationsToZero()
