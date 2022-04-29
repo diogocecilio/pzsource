@@ -36,7 +36,8 @@ class TPZBndCondBase :
     void SetMaterial(TPZMaterial *) final;
     
     [[nodiscard]] int Dimension() const final
-    {return this->fMaterial->Dimension();}
+   // {return this->fMaterial->Dimension();}
+    {return this->fMaterial->Dimension() - 1;}
     [[nodiscard]] int NStateVariables() const final
     {return this->fMaterial->NStateVariables();}
 
@@ -44,6 +45,12 @@ class TPZBndCondBase :
         return TPZMaterial::Id();
     }
 
+       [[nodiscard]] int NSolutionVariables(int var) const final
+    { return this->fMaterial->NSolutionVariablesBC(var);}
+    
+    [[nodiscard]] int VariableIndex(const std::string &name) const final
+     { return this->fMaterial->VariableIndex(name);}
+     
     [[nodiscard]] TPZMaterial* NewMaterial() const override {
         return new TPZBndCondBase(*this);
     }

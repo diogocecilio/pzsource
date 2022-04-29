@@ -983,7 +983,7 @@ void TPZElastoPlasticAnalysis::SetAllCreateFunctionsWithMem(TPZCompMesh *cmesh)
 	pzgeom::TPZGeoCube::fp = TPZElastoPlasticAnalysis::CreateCubeElWithMem;
 */
     TPZManVector<TCreateFunction,10> functions(8);
-
+	TCreateFunction fp[8];
     /*functions[EPoint] = &TPZElastoPlasticAnalysis::CreatePointElWithMem;
 	functions[EOned] = TPZElastoPlasticAnalysis::CreateLinearElWithMem;
 	functions[EQuadrilateral] = TPZElastoPlasticAnalysis::CreateQuadElWithMem;
@@ -992,6 +992,12 @@ void TPZElastoPlasticAnalysis::SetAllCreateFunctionsWithMem(TPZCompMesh *cmesh)
 	functions[ETetraedro] = TPZElastoPlasticAnalysis::CreateTetraElWithMem;
 	functions[EPiramide] = TPZElastoPlasticAnalysis::CreatePyramElWithMem;
 	functions[ECube] = TPZElastoPlasticAnalysis::CreateCubeElWithMem;*/
+	
+	// These ones will be always continuous for viscoelasticity
+	
+	//fp[EPoint]=TPZElastoPlasticAnalysis::CreatePointElWithMem;
+	
+	
     cmesh->ApproxSpace().SetCreateFunctions(functions);
 
 }

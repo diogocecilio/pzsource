@@ -153,7 +153,22 @@ virtual int ClassId() const override;
 	 * Read the element data from a stream
 	 */
 	virtual void Read(TPZStream &buf, void *context) override;
+	
+        void GetSolDimensions(uint64_t &u_len,
+                          uint64_t &du_row,
+                          uint64_t &du_col) const override
+    {u_len=2;du_row=2;du_col=2;}
     
+
+// [[nodiscard]] virtual int NSolutionVariablesBC(int var) const;
+// [[nodiscard]] int NSolutionVariables(int var) const final;
+// [[nodiscard]] int VariableIndex(const std::string &name) const final;
+
+//   int NSolutionVariablesBC(int var) const override;
+// 
+// 				
+//   void SolutionBC(const TPZMaterialDataT<STATE> &data,int var, TPZVec<STATE> &solOut) ;
+
 	
 protected:
 	

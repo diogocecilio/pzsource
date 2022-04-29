@@ -31,6 +31,9 @@ public:
 
   /** @brief Returns the load vector */
 	TPZSolutionMatrix &Rhs() { return fRhs;}
+	
+	  /** @brief Returns the load vector */
+	TPZSolutionMatrix &Stiff() { return fMatrix;}
 
   /** @brief Assemble the stiffness matrix and load vector */
 	 void Assemble() override;
@@ -84,6 +87,10 @@ public:
 protected:
   /** @brief Load vector */
 	TPZSolutionMatrix fRhs;
+	
+	  /** @brief Stiffness matrix */
+	TPZSolutionMatrix fMatrix;
+	
   /** @brief Time variable used for post-processing*/
 	REAL fTime{0.};
 private:

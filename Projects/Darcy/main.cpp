@@ -80,9 +80,9 @@ TPZCompMesh * CreateCMesh ( TPZGeoMesh *gmesh, int pOrder );
 int main()
 {
 	
-	int porder=3;
+	int porder=1;
 	
-	int ref=3;
+	int ref=0;
 	
     //TPZGeoMesh *gmesh = CreateGMesh( ref);
 	TPZGeoMesh *gmesh = CreateGMeshSlope( ref);
@@ -103,7 +103,7 @@ int main()
     //Resolvendo o Sistema:
     int numthreads = 0;
 	
-    bool optimizeBandwidth = false; // Prevents of renumbering of the equations (As the same of Oden's result)
+    bool optimizeBandwidth = true; // Prevents of renumbering of the equations (As the same of Oden's result)
     
     TPZLinearAnalysis analysis ( cmesh,optimizeBandwidth ); // Create analysis
 
@@ -121,9 +121,16 @@ int main()
     TPZStepSolver<STATE> step;
     step.SetDirect ( ELDLt );
     analysis.SetSolver ( step );
+	
+	analysis.Assemble();
+	
+	std::ofstream sout ( "rhs.nb" );
+	analysis.Rhs().Print("Rhs = ",sout,EMathematicaInput);
 
     analysis.Run();
 
+	
+	
     ///vtk export
     TPZVec<std::string> scalarVars ( 1 ),vectorVars ( 1 );
     scalarVars[0] = "Pressure";
@@ -384,12 +391,12 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
   };
 	material->SetForcingFunction(rhs,pOrder);
 	
-    cmesh->InsertMaterialObject ( material );
+
 
     // Condition of contours
     TPZFMatrix<STATE>  val1 ( 2,2,0. );
 	
-    TPZManVector<STATE,2> val2 ( 2,0. );
+    TPZManVector<STATE,1> val2 ( 1,0. );
 
 
 	int dirichlet = 0 ;
@@ -414,6 +421,7 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
 	
 	auto * BCond5 = material->CreateBC ( material, leftbc_slope, dirichlet, val1, val2 );
 
+	cmesh->InsertMaterialObject ( material );
 	cmesh->InsertMaterialObject ( BCond0 );
     cmesh->InsertMaterialObject ( BCond1 );
 	cmesh->InsertMaterialObject ( BCond2 );
@@ -425,7 +433,8 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
     cmesh->AutoBuild();
     cmesh->AdjustBoundaryElements();
     cmesh->CleanUpUnconnectedNodes();
-
+	cmesh->SetAllCreateFunctionsContinuous();
+	
     return cmesh;
 }
 

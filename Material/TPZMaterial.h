@@ -96,6 +96,9 @@ public:
      * @}
      */
     
+	
+	[[nodiscard]] virtual int NSolutionVariablesBC(int var) const ;
+	
     /** @brief Creates a copy of the material object and put it in the vector which is passed on */
     virtual void Clone(std::map<int, TPZMaterial * > &matvec);
 

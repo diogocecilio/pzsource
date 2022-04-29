@@ -154,7 +154,7 @@ public:
         fMeshVec.Resize(0);
     }
     
-	
+
 protected:
 	
 	/* @brief Cumulative solution vector*/

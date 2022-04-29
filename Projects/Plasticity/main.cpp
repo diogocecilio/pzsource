@@ -44,6 +44,15 @@
 #include <TPZSimpleTimer.h>
 #include "TPZBndCondT.h"
 #include "DarcyFlow/TPZDarcyFlow.h"
+
+
+#include "Plasticity/pzelastoplasticanalysis.h"
+#include "Plasticity/TPZYCMohrCoulombPV.h"
+#include "Plasticity/TPZMatElastoPlastic_impl.h"
+#include "Plasticity/TPZMatElastoPlastic2D.h"
+#include "Plasticity/TPZMatElastoPlastic.h"
+
+
 using namespace std;
 
 class TPZMaterial;
@@ -65,22 +74,22 @@ int topbc = -3;
 int leftbc = -4;
 
 // brief Function to create the geometric mesh
-TPZGeoMesh *CreateGMesh (int ref );
 
-TPZGeoMesh *  CreateGMeshSlope ( int ref );
+typedef TPZMatElastoPlastic2D<TPZYCMohrCoulombPV,TPZElastoPlasticMem> plasticmorh;
+typedef   TPZMatElastoPlastic2D < TPZPlasticStepPV<TPZYCMohrCoulombPV, TPZElasticResponse>, TPZElastoPlasticMem > plasticmat;
 
-TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder );
+TPZGeoMesh *  CreateGMeshSlope( int ref );
 
-TPZCompMesh * CreateCMesh ( TPZGeoMesh *gmesh, int pOrder );
+TPZCompMesh * CreateCMeshSlope( TPZGeoMesh *gmesh, int pOrder );
 
 int main()
 {
 	
-	int porder=3;
+	int porder=1;
 	
-	int ref=3;
+	int ref=0;
 	
-    TPZGeoMesh *gmesh = CreateGMesh( ref);
+    TPZGeoMesh *gmesh = CreateGMeshSlope( ref);
 	//TPZGeoMesh *gmesh = CreateGMeshSlope( ref);
 
     std::ofstream meshfile ( "GeoMeshSlope.txt" );
@@ -88,7 +97,7 @@ int main()
     gmesh->Print ( meshfile );
 
     // Create computational mesh
-    TPZCompMesh *cmesh = CreateCMesh ( gmesh, porder );
+    TPZCompMesh *cmesh = CreateCMeshSlope ( gmesh, porder );
 	
 	//TPZCompMesh *cmesh = CreateCMeshSlopeFlow ( gmesh, porder );
 	
@@ -98,10 +107,8 @@ int main()
 
     //Resolvendo o Sistema:
     int numthreads = 0;
-	
-    bool optimizeBandwidth = false; // Prevents of renumbering of the equations (As the same of Oden's result)
-    
-    TPZLinearAnalysis analysis ( cmesh,optimizeBandwidth ); // Create analysis
+
+    TPZNonLinearAnalysis analysis ( cmesh,std::cout ); // Create analysis
 
     //sets number of threads to be used by the solver
 
@@ -118,17 +125,11 @@ int main()
     step.SetDirect ( ELDLt );
     analysis.SetSolver ( step );
 
-    analysis.Run();
-
-    ///vtk export
-    TPZVec<std::string> scalarVars ( 1 ),vectorVars ( 1 );
-    scalarVars[0] = "Pressure";
-    vectorVars[0] = "Flux";
-    analysis.DefineGraphMesh ( 2,scalarVars,vectorVars,"Darcy.vtk" );
-    constexpr int resolution{0};
-    analysis.PostProcess ( resolution );
-
-    std::cout << "FINISHED!" << std::endl;
+	REAL tol=1.e-3;
+	int numiter=3;
+	bool linesearch=true;
+	bool checkconv= false;
+    analysis.IterativeProcess(std::cout,tol,numiter,linesearch,checkconv);
 
 
     return 0;
@@ -348,7 +349,7 @@ vector<vector<int>> topol = {{0,  1,  14, 13},{1,  2,  10, 14}, {14, 10, 3,  12}
     return gmesh;
 }
 
-TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
+TPZCompMesh * CreateCMeshSlope ( TPZGeoMesh *gmesh, int pOrder )
 {
 	    // Creating computational mesh:
     TPZCompMesh * cmesh = new TPZCompMesh ( gmesh );
@@ -359,23 +360,12 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
 	
 	cmesh->SetDimModel ( dim );
     
-	cmesh->SetAllCreateFunctionsContinuous();
+	cmesh->SetAllCreateFunctionsContinuousWithMem();
 
 	int matid=1;
+	int planestrain=1;
 	
-    auto *material = new TPZDarcyFlow ( matid,dim );
-	//auto *material = new TPZHybridDarcyFlow ( matid,dim );
-	//auto *material = new TPZMixedDarcyFlow ( matid,dim );
-	REAL permeability = 1.;
-    material->SetConstantPermeability ( permeability );
-	
-  
-  const auto rhs = [](const TPZVec<REAL>&loc, TPZVec<STATE> &u){
-        const REAL &x = loc[0];
-        const REAL &y = loc[1];
-        u[0] = -1;
-  };
-	material->SetForcingFunction(rhs,pOrder);
+	auto * material = new plasticmat(matid,planestrain);
 	
     cmesh->InsertMaterialObject ( material );
 
@@ -384,35 +374,24 @@ TPZCompMesh * CreateCMeshSlopeFlow ( TPZGeoMesh *gmesh, int pOrder )
 	
     TPZManVector<STATE,2> val2 ( 2,0. );
 
+	int directionaldirichlet = 3 ;
 
-	int dirichlet = 0 ;
-	
-	auto pressure = [](const TPZVec<REAL>&loc, TPZVec<STATE> &u, TPZFMatrix<REAL> &grad){
-		REAL &x = loc[0];
-		REAL &y = loc[1];
-		REAL &z = loc[2];
-        u[0] = x;
+	val2[0]=1;
+	val2[1]=1;
+    auto * BCond0 = material->CreateBC ( material, bottombc_slope, directionaldirichlet, val1, val2 );
 
-  	};
+	val2[0]=1;
+	val2[1]=0;
+    auto * BCond1 = material->CreateBC ( material, rigthbc_slope, directionaldirichlet, val1, val2 );
 	
-    auto * BCond0 = material->CreateBC ( material, bottombc_slope, dirichlet, val1, val2 );
-
-    auto * BCond1 = material->CreateBC ( material, rigthbc_slope, dirichlet, val1, val2 );
-	
-	auto * BCond2 = material->CreateBC ( material, toprigthbc_slope, dirichlet, val1, val2 );
-
-	auto * BCond3 = material->CreateBC ( material, rampbc_slope, dirichlet, val1, val2 );
-	
-	auto * BCond4 = material->CreateBC ( material, topleftbc_slope, dirichlet, val1, val2 );
-	
-	auto * BCond5 = material->CreateBC ( material, leftbc_slope, dirichlet, val1, val2 );
+	val2[0]=1;
+	val2[1]=0;
+	auto * BCond2 = material->CreateBC ( material, leftbc_slope, directionaldirichlet, val1, val2 );
 
 	cmesh->InsertMaterialObject ( BCond0 );
     cmesh->InsertMaterialObject ( BCond1 );
 	cmesh->InsertMaterialObject ( BCond2 );
-	cmesh->InsertMaterialObject ( BCond3 );
-	cmesh->InsertMaterialObject ( BCond4 );
-	cmesh->InsertMaterialObject ( BCond5 );
+
 	
     //Creating computational elements that manage the space of the mesh:
     cmesh->AutoBuild();

@@ -45,6 +45,8 @@ public :
     void Read(TPZStream& buf, void* context) override;
 
     void Write(TPZStream& buf, int withclassid) const override;
+	
+	
 protected:
 	/** @brief Boundary condition type. */
 	int fType{-1};

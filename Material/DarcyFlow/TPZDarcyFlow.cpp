@@ -54,6 +54,9 @@ void TPZDarcyFlow::ContributeBC(const TPZMaterialDataT<STATE> &data, STATE weigh
     int phr = phi.Rows();
     int in, jn;
 
+	
+	const auto &BIGNUMBER  = TPZMaterial::fBigNumber;
+	
     STATE v2 = bc.Val2()[0];
 
     if (bc.HasForcingFunctionBC()) {
@@ -66,11 +69,12 @@ void TPZDarcyFlow::ContributeBC(const TPZMaterialDataT<STATE> &data, STATE weigh
     switch (bc.Type()) {
         case 0 : // Dirichlet condition
             for (in = 0; in < phr; in++) {
-                ef(in, 0) += (STATE) (TPZMaterial::fBigNumber * phi(in, 0) * weight) * v2;
+                ef(in, 0) += BIGNUMBER * phi(in, 0) * weight* v2;
                 for (jn = 0; jn < phr; jn++) {
-                    ek(in, jn) += TPZMaterial::fBigNumber * phi(in, 0) * phi(jn, 0) * weight;
+                    ek(in, jn) += BIGNUMBER * phi(in, 0) * phi(jn, 0) * weight;
                 }
             }
+            //ek.Print(std::cout);
             break;
         case 1 : // Neumann condition
             for (in = 0; in < phi.Rows(); in++) {
@@ -93,6 +97,7 @@ void TPZDarcyFlow::ContributeBC(const TPZMaterialDataT<STATE> &data, STATE weigh
                     << "\t 2: Robin\n";
             DebugStop();
     }
+    
 }
 
 int TPZDarcyFlow::VariableIndex(const std::string &name) const {

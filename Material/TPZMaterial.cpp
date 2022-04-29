@@ -23,7 +23,13 @@ int TPZMaterial::NSolutionVariables(int index) const{
 	DebugStop();
 	return 0;
 }
-
+int TPZMaterial::NSolutionVariablesBC(int index) const{
+	PZError<<__PRETTY_FUNCTION__;
+	PZError<<" Implement me in your material for post processing solutions\n"
+				 <<" over boundary elements\n"<<std::endl;
+	DebugStop();
+	return 0;
+}
 TPZMaterial* TPZMaterial::NewMaterial() const{
 	PZError<<__PRETTY_FUNCTION__;
 	PZError<<" should not be called. Implement me! Aborting...\n";

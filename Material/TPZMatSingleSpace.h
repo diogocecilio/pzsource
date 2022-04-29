@@ -160,6 +160,9 @@ public:
     */
     virtual void Solution(const TPZMaterialDataT<TVar> &data, int var,
                           TPZVec<TVar> &sol);
+	
+    virtual void SolutionBC(const TPZMaterialDataT<TVar> &data, int var,
+                          TPZVec<TVar> &sol);    
     
     [[nodiscard]] int IntegrationRuleOrder(const int elPMaxOrder) const override;
     
@@ -171,6 +174,8 @@ class TPZMaterial;
 /**
    @brief Boundary condition interface for TPZMatSingleSpaceT.
 */
+  
+
 template <class TVar>
 class TPZMatSingleSpaceBC : public TPZMatSingleSpaceT<TVar>
 {
@@ -191,6 +196,10 @@ public:
     /** @brief This method should never be called. Throws.*/
     void Solution(const TPZMaterialDataT<TVar> &data, int var,
                   TPZVec<TVar> &sol) override;
+				  
+	
+
+	
     /** @brief Forward the call to TPZMatSingleSpaceT::FillBoundaryConditionDataRequirements*/
     void FillDataRequirements(TPZMaterialData &data) const override;
     

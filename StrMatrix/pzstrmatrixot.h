@@ -12,6 +12,12 @@ synchronized.
 #include "TPZSemaphore.h"
 #include <mutex>
 
+#include <cmath>
+#include <set>
+
+#include <iostream>
+#include <fstream>
+#include <string>
 //forward declarations
 class TPZElementMatrix;
 class TPZBaseMatrix;

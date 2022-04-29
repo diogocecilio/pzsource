@@ -361,6 +361,9 @@ TPZStructMatrixOR<TVar>::Serial_Assemble(TPZBaseMatrix & stiff_base, TPZBaseMatr
     }
 
 #endif
+//std::stringstream sout;
+std::ofstream sout ( "stiff.nb" );
+stiffness.Print("GK = ",sout,EMathematicaInput);
 
 }
 
